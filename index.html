@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updates by Om</title>
+    <style>
+       body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            justify-content: left;
+            height: 100vh;
+        }
+        header {
+            background-color: #8a7373;
+            color: #fff;
+            text-align: left;
+            padding: 1rem 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .greeting {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .clock {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .add-update {
+            margin-bottom: 20px;
+        }
+        #updateContent {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .update {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .update h2 {
+            margin-top: 0;
+        }
+        .timestamp {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+            <h1>Daily Updates by Om.</h1>
+    </header>
+    <div class="container">
+        <div class="greeting" id="greeting"></div>
+        <div class="clock" id="clock"></div>
+        <div class="add-update">
+            <h2>My daily updates are,</h2>
+            <textarea id="updateContent" placeholder="Enter your daily update"></textarea>
+            <button id="addUpdateBtn">Add Update</button>
+        </div>
+        <div class="update-list" id="updateList">
+            <!-- Updates will be dynamically added here -->
+        </div>
+    </div>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('clock').innerText = `${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateClock, 1000);
+
+        function addUpdateToLocalStorage(content) {
+            const updates = JSON.parse(localStorage.getItem('updates')) || [];
+            updates.push({ content, timestamp: new Date().toLocaleString() });
+            localStorage.setItem('updates', JSON.stringify(updates));
+        }
+
+        function renderUpdates() {
+            const updateList = document.getElementById('updateList');
+            updateList.innerHTML = '';
+
+            const updates = JSON.parse(localStorage.getItem('updates')) || [];
+            updates.forEach((update, index) => {
+                const updateDiv = document.createElement('div');
+                updateDiv.className = 'update';
+                updateDiv.innerHTML = `
+                    <h2>Day ${index + 1} Update</h2>
+                    <p>${update.content}</p>
+                    <p class="timestamp">Posted on: ${update.timestamp}</p>
+                    <button onclick="removeUpdate(${index})">Remove Update</button>
+                `;
+                updateList.appendChild(updateDiv);
+            });
+        }
+
+        function removeUpdate(index) {
+            const updates = JSON.parse(localStorage.getItem('updates')) || [];
+            updates.splice(index, 1);
+            localStorage.setItem('updates', JSON.stringify(updates));
+            renderUpdates();
+        }
+
+        document.getElementById('addUpdateBtn').addEventListener('click', () => {
+            const updateContent = document.getElementById('updateContent').value;
+            if (updateContent.trim() !== '') {
+                addUpdateToLocalStorage(updateContent);
+                document.getElementById('updateContent').value = '';
+                renderUpdates();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting = '';
+            if (hours < 12) {
+                greeting = 'Good morning';
+            } else if (hours < 18) {
+                greeting = 'Good afternoon';
+            } else {
+                greeting = 'Good evening';
+            }
+            document.getElementById('greeting').innerText = greeting;
+
+            renderUpdates();
+        });
+
+    
+    </script>
+    <link rel="scriptnode" href="server.js">
+</body>
+</html>
